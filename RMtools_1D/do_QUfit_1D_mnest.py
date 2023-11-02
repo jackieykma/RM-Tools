@@ -425,14 +425,36 @@ def run_qufit(
     errPlus = [None] * nDim
     errMinus = [None] * nDim
     # g = lambda v: (v[1], v[2]-v[1], v[1]-v[0])
+    # Generate a second set of sample with angles shifted by 90 deg
+    result2 = copy.copy(result)
+    for i in range(nDim):
+        if parNames[i][-3:] == 'deg':
+            # Units being deg --> PA --> shift by 90 deg
+            result2.samples[:,i] += 90.
+            # Keep all the values within [0, 180)
+            result2.samples[:,i] -= (result2.samples[:,i] >= 180.)*180.
+    # Update the posterior values
+    result2.samples_to_posterior()
+    # Calculate the values and uncertainties
     for i in range(nDim):
         summary = result.get_one_dimensional_median_and_error_bar(parNames[i])
-        # Get stats around modal value
-        p[i], errPlus[i], errMinus[i] = (
-            summary.median,
-            summary.plus,
-            summary.minus,
-        )
+        summary2 = result2.get_one_dimensional_median_and_error_bar(parNames[i])
+        # Get stats aruond modal value
+        if parNames[i][-3:] != 'deg' or (summary.median >= 45. and summary.median < 135.):
+            # Parameter is not PA, or PA0 is in [45, 135) (Angle wrapping not an issue)
+            p[i], errPlus[i], errMinus[i] = (
+                summary.median,
+                summary.plus,
+                summary.minus,
+            )
+        else:
+            # If angle wrapping can be an issue (need to subtract 90 deg back)
+            p[i], errPlus[i], errMinus[i] = (
+                (summary2.median-90.)+((summary2.median-90.)<0.)*180.,
+                summary2.plus,
+                summary2.minus,
+            )
+
 
     # Calculate goodness-of-fit parameters
     nData = 2.0 * len(lamSqArr_m2)
