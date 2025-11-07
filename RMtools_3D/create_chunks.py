@@ -51,7 +51,7 @@ def main():
         "-p", dest="prefix", default=None, help="Prefix of output files [filename]"
     )
     parser.add_argument(
-        "-m", dest="memmap", default=False, help="Turn off memory mapping (i.e. Load in the entire input cube to memory). Speed up the chunking process at the cost of memory use."
+        "-m", dest="memmap", action="store_true", help="Turn off memory mapping (i.e. Load in the entire input cube to memory). Speed up the chunking process at the cost of memory use."
     )
 
     args = parser.parse_args()
