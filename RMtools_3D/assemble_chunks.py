@@ -47,6 +47,12 @@ def main():
         action="store_true",
         help="Overwrite existing file? [False].",
     )
+    parser.add_argument(
+        "-m",
+        dest="memmap",
+        action="store_true",
+        help="Turn off memory mapping (i.e. Load in the entire input cube to memory). Speed up the chunking process at the cost of memory use."
+    )
 
     args = parser.parse_args()
 
@@ -60,6 +66,11 @@ def main():
         )
     else:
         output_filename = args.output
+
+    if args.memmap == True:
+        args.memmap = False
+    elif args.memmap == False:
+        args.memmap = True
 
     # Get all the chunk filenames. Missing chunks will break things!
     filename = re.search("\.C\d+\.", args.chunkname)
@@ -107,7 +118,7 @@ def main():
 
     base_idx_arr = np.array(range(Nperchunk))
 
-    large = pf.open(output_filename, mode="update", memmap=True)
+    large = pf.open(output_filename, mode="update", memmap=args.memmap)
 
     for i in trange(num_chunks - 1, desc="Assembling chunks"):
         file = chunkfiles[i]
@@ -115,7 +126,7 @@ def main():
         xarr = idx // y_dim
         yarr = idx % y_dim
 
-        chunk = pf.open(file, memmap=True)
+        chunk = pf.open(file, memmap=args.memmap)
         if Ndim == 4:
             large[0].data[:, :, yarr, xarr] = chunk[0].data[:, :, 0, :]
         elif Ndim == 3:
@@ -132,7 +143,7 @@ def main():
     idx = idx[idx < Npix_image]
     xarr = idx // y_dim
     yarr = idx % y_dim
-    chunk = pf.open(file, memmap=True)
+    chunk = pf.open(file, memmap=args.memmap)
     if Ndim == 4:
         large[0].data[:, :, yarr, xarr] = chunk[0].data[:, :, 0, :]
     elif Ndim == 3:
