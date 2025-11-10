@@ -51,7 +51,7 @@ def main():
         "-m",
         dest="memmap",
         action="store_true",
-        help="Turn off memory mapping (i.e. Load in the entire output cube to memory). Speed up the assembling process at the cost of memory use."
+        help="Turn off memory mapping (i.e. Load in the entire output cube to memory). Speed up the assembling process at the cost of memory use.",
     )
 
     args = parser.parse_args()
