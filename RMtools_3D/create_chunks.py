@@ -50,6 +50,12 @@ def main():
     parser.add_argument(
         "-p", dest="prefix", default=None, help="Prefix of output files [filename]"
     )
+    parser.add_argument(
+        "-m",
+        dest="memmap",
+        action="store_true",
+        help="Turn off memory mapping (i.e. Load in the entire input cube to memory). Speed up the chunking process at the cost of memory use.",
+    )
 
     args = parser.parse_args()
 
@@ -63,7 +69,11 @@ def main():
     else:
         prefix = args.prefix
 
-    hdu = pf.open(args.infile, memmap=True)
+    if args.memmap == True:
+        args.memmap = False
+    elif args.memmap == False:
+        args.memmap = True
+    hdu = pf.open(args.infile, memmap=args.memmap)
     header = hdu[0].header
     data = np.transpose(hdu[0].data)
 
