@@ -1,6 +1,11 @@
+1.4.10:
+-added warning to rmsynth3d if users specify both Stokes I model and noise vector (not compatible at present)
+-for chunking tools, added optional memmap keyword to allow loading of arrays into memory (speeds up, if there is enough available memory)
+-dropped support for Py3.7 (something is broken, and not worth fixing)
+-This is the version going into Zenodo as the official version as of time of publication of the RM-Tools paper. Future major patches will also be uploaded to Zenodo.
 
 1.4.9:
--Fixed numpy deprecations in assemble chunks tool, QU-fitting, and 1D synth/clean (thanks tYingkang Zhang)
+-Fixed numpy deprecations in assemble chunks tool, QU-fitting, and 1D synth/clean (thanks to Yingkang Zhang)
 -Fixed peakfitting tool from crashing when running on chunks
 
 1.4.8:
